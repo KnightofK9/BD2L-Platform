@@ -1,5 +1,5 @@
 # BD2L-Platform
-Môi trường sử dụng: conda, python 2.7
+Môi trường sử dụng: conda, python 2.7  
 Thư viện sử dụng:  
 * opencv 3.3.1  
 * ffmpeg 3.4.1  
