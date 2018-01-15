@@ -1,4 +1,9 @@
 # BD2L-Platform
+Môi trường sử dụng: conda, python 2.7
+Thư viện sử dụng:  
+* opencv 3.3.1  
+* ffmpeg 3.4.1  
+
 Platform đọc video và xuất video dựa theo yêu cầu của Cuộc Đua Số  
 Thể lệ cuộc đua số : https://drive.google.com/file/d/0Bxfxgt9AZux0Q2JZZmcwbDZYWVk/view  
 Input:  
