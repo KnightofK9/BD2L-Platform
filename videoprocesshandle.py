@@ -41,8 +41,11 @@ class VideoProcessHandle:
         top = randint(0, 300)
         bottom = top + 100
         sign_id = 1
+        obj = {"left": left, "right": right, "top": top, "bottom": bottom, "sign_id": sign_id}
+        is_object_found = True
         # End data
-        self.on_object_found(left, top, right, bottom, sign_id, image, frame_id)
+        if is_object_found:
+            self.on_object_found(obj["left"], obj["top"], obj["right"], obj["bottom"], obj["sign_id"], image, frame_id)
         self.out.write(image)
 
     def on_video_loaded(self, video):
