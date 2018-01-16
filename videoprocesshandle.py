@@ -24,19 +24,16 @@ class VideoProcessHandle:
         self.key_frame_list = key_frame_list
         # Array hold all detected obj info
         self.detected_obj_list = []
-        # Output video in XVID
-        fourcc = cv2.VideoWriter_fourcc(*'XVID')
-        self.out = cv2.VideoWriter('output.avi', fourcc, 20.0, (640, 480))
-
+        self.out = None
     def on_receive_frame(self, frame_id, image):
         if not self.is_frame_accepted(frame_id, image):
             self.out.write(image)
             return
         print "Processing frame {}".format(str(frame_id))
-        [obj, is_object_found] = self.find_object(image)
+        [obj, is_object_found, img] = self.find_object(image)
         if is_object_found:
             self.on_object_found(obj["left"], obj["top"], obj["right"], obj["bottom"], obj["sign_id"], image, frame_id)
-        self.out.write(image)
+        self.out.write(img)
 
     def find_object(self, image):
         # TODO: process all accepted frame here, found the top, left, right, bottom, sign_id and pass to on_object_found
@@ -49,16 +46,23 @@ class VideoProcessHandle:
         obj = {"left": left, "right": right, "top": top, "bottom": bottom, "sign_id": sign_id}
         is_object_found = True
         # End data
-        return [obj, is_object_found]
+        return [obj, is_object_found,image]
 
     def on_video_loaded(self, video):
         (major_ver, minor_ver, subminor_ver) = cv2.__version__.split('.')
         if int(major_ver) < 3:
             input_width = video.get(cv2.cv.CV_CAP_PROP_FRAME_WIDTH)
             input_height = video.get(cv2.cv.CV_CAP_PROP_FRAME_HEIGHT)
+            fps = video.get(cv2.cv.CV_CAP_PROP_FPS)
         else:
             input_width = video.get(cv2.CAP_PROP_FRAME_WIDTH)
             input_height = video.get(cv2.CAP_PROP_FRAME_HEIGHT)
+            fps = video.get(cv2.CAP_PROP_FPS)
+        # Output video in XVID
+        fourcc = cv2.VideoWriter_fourcc(*'XVID')
+        # fourcc = cv2.VideoWriter_fourcc('M', 'J', 'P', 'G')
+        self.out = cv2.VideoWriter('output.avi', fourcc, fps, (640, 480))
+
         self.input_width = input_width
         self.input_height = input_height
 
