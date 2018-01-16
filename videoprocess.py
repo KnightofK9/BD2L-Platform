@@ -14,12 +14,10 @@ class VideoProcess:
             print "Read video failed!"
             return
         handle.on_video_loaded(video)
-        handle.on_receive_frame(count, image)
-        count += 1
         while success:
-            success, image = video.read()
-            count += 1
             handle.on_receive_frame(count, image)
+            count += 1
+            success, image = video.read()
         print "Read video completed!"
         handle.on_video_completed()
         video.release()
