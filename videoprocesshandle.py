@@ -23,7 +23,7 @@ class VideoProcessHandle:
         # Key frame list
         self.key_frame_list = key_frame_list
         # Array hold all detected obj info
-        self.detected_obj_list = []
+        self.detected_obj_list = None
         self.out = None
     def on_receive_frame(self, frame_id, image):
         if not self.is_frame_accepted(frame_id, image):
@@ -62,7 +62,7 @@ class VideoProcessHandle:
         fourcc = cv2.VideoWriter_fourcc(*'XVID')
         # fourcc = cv2.VideoWriter_fourcc('M', 'J', 'P', 'G')
         self.out = cv2.VideoWriter('output.avi', fourcc, fps, (640, 480))
-
+        self.detected_obj_list = []
         self.input_width = input_width
         self.input_height = input_height
 
