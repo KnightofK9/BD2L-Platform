@@ -27,13 +27,18 @@ class VideoProcessHandle:
         # Output video in XVID
         fourcc = cv2.VideoWriter_fourcc(*'XVID')
         self.out = cv2.VideoWriter('output.avi', fourcc, 20.0, (640, 480))
-        pass
 
     def on_receive_frame(self, frame_id, image):
         if not self.is_frame_accepted(frame_id, image):
             self.out.write(image)
             return
         print "Processing frame {}".format(str(frame_id))
+        [obj, is_object_found] = self.find_object(image)
+        if is_object_found:
+            self.on_object_found(obj["left"], obj["top"], obj["right"], obj["bottom"], obj["sign_id"], image, frame_id)
+        self.out.write(image)
+
+    def find_object(self, image):
         # TODO: process all accepted frame here, found the top, left, right, bottom, sign_id and pass to on_object_found
         # Dummy data
         left = randint(0, 500)
@@ -44,9 +49,7 @@ class VideoProcessHandle:
         obj = {"left": left, "right": right, "top": top, "bottom": bottom, "sign_id": sign_id}
         is_object_found = True
         # End data
-        if is_object_found:
-            self.on_object_found(obj["left"], obj["top"], obj["right"], obj["bottom"], obj["sign_id"], image, frame_id)
-        self.out.write(image)
+        return [obj, is_object_found]
 
     def on_video_loaded(self, video):
         (major_ver, minor_ver, subminor_ver) = cv2.__version__.split('.')
