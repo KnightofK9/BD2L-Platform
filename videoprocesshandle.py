@@ -25,28 +25,32 @@ class VideoProcessHandle:
         # Array hold all detected obj info
         self.detected_obj_list = None
         self.out = None
+
     def on_receive_frame(self, frame_id, image):
         if not self.is_frame_accepted(frame_id, image):
             self.out.write(image)
             return
         print "Processing frame {}".format(str(frame_id))
-        [obj, is_object_found, img] = self.find_object(image)
+        [objs, is_object_found, img] = self.find_object(image)
         if is_object_found:
-            self.on_object_found(obj["left"], obj["top"], obj["right"], obj["bottom"], obj["sign_id"], image, frame_id)
+            for obj in objs:
+                self.on_object_found(obj["left"], obj["top"], obj["right"], obj["bottom"], obj["sign_id"], image,
+                                     frame_id)
         self.out.write(img)
 
     def find_object(self, image):
         # TODO: process all accepted frame here, found the top, left, right, bottom, sign_id and pass to on_object_found
         # Dummy data
-        left = randint(0, 500)
+        left = 200
+        top = 100
         right = left + 100
-        top = randint(0, 300)
         bottom = top + 100
-        sign_id = 1
+        sign_id = 2
         obj = {"left": left, "right": right, "top": top, "bottom": bottom, "sign_id": sign_id}
         is_object_found = True
         # End data
-        return [obj, is_object_found,image]
+        objs = [obj]  # List of detected object
+        return [objs, is_object_found, image]
 
     def on_video_loaded(self, video):
         (major_ver, minor_ver, subminor_ver) = cv2.__version__.split('.')
@@ -73,16 +77,14 @@ class VideoProcessHandle:
 
     def on_object_found(self, left, top, right, bottom, sign_id, image, frame_id):
         self.draw_rect_on_image(image, left, top, right, bottom)
-        self.draw_text_on_image(image, sign_id)
+        self.draw_text_on_image(image, sign_id, left, top)
         self.save_detected_obj_info(frame_id, sign_id, left, top, right, bottom)
 
-    def draw_text_on_image(self, image, sign_id):
+    def draw_text_on_image(self, image, sign_id, left, top):
         font = cv2.FONT_HERSHEY_SIMPLEX
         name = self.get_name_of_sign_id(sign_id)
-        left = int(self.input_width * 0)
-        top = int(self.input_height * 0.7)
 
-        cv2.putText(image, name, (left, top), font, 2, (255, 255, 255), 2, cv2.LINE_AA)
+        cv2.putText(image, name, (left, top - 10), font, 0.5, (255, 255, 255), 1, cv2.LINE_8)
 
     def save_detected_obj_info(self, frame_id, sign_id, left, top, right, bottom):
         self.detected_obj_list.append([frame_id, sign_id, left, top, right, bottom])
@@ -103,7 +105,7 @@ class VideoProcessHandle:
         self.out.release()
 
     def draw_rect_on_image(self, image, left, top, right, bottom):
-        cv2.rectangle(image, (top, left), (bottom, right), (0, 255, 0), 3)
+        cv2.rectangle(image, (left, top), (right, bottom), (0, 255, 0), 3)
 
     def get_name_of_sign_id(self, sign_id):
         return self.name_of_sign_id_dict[str(sign_id)]
